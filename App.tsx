@@ -34,6 +34,28 @@ const App: React.FC = () => {
     setIsSidebarOpen(false);
   }, []);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const defaultPage = user === UserRole.Public ? 'public-dashboard' : 'dashboard';
+      const hash = window.location.hash.replace('#', '') || defaultPage;
+
+      console.log('Hash changed!');
+      console.log('- window.location.hash:', window.location.hash);
+      console.log('- processed hash:', hash);
+      console.log('- current state.page:', page);
+
+      if (hash !== page) {
+        console.log('- Setting page state to:', hash);
+        setPage(hash);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange();
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [user, page]);
+
   // Force re-render when history changes
   useEffect(() => {
     console.log('App: history changed, length:', history.length);
@@ -62,25 +84,34 @@ const App: React.FC = () => {
   };
 
   const renderPolicymakerPage = () => {
+    console.log('renderPolicymakerPage called, page =', page);
     const policymakerPages = new Set(['dashboard', 'policy-simulator', 'impact-analysis', 'stakeholder-reports', 'historical-analysis', 'comparison', 'comparison-results']);
     if (!policymakerPages.has(page)) {
+      console.log('  -> NOT in policymakerPages, returning DashboardPage');
       return <DashboardPage userRole={user!} />;
     }
 
-    switch (page) {
+    switch(page) {
       case 'dashboard':
+        console.log('  -> rendering dashboard');
         return <DashboardPage userRole={user!} history={history} />;
       case 'policy-simulator':
+        console.log('  -> rendering policy-simulator');
         return <PolicySimulatorPage userRole={user!} setHistory={setHistory} history={history} />;
       case 'impact-analysis':
+        console.log('  -> rendering impact-analysis');
         return <ImpactAnalysisPage history={history} />;
       case 'stakeholder-reports':
+        console.log('  -> rendering stakeholder-reports');
         return <StakeholderReportsPage history={history} />;
       case 'historical-analysis':
+        console.log('  -> rendering historical-analysis');
         return <HistoricalAnalysisPage history={history} />;
       case 'comparison':
+        console.log('  -> rendering comparison');
         return <ComparisonPage history={history} />;
       case 'comparison-results':
+        console.log('  -> rendering comparison-results');
         try {
           return <ComparisonResultsPage history={history} />;
         } catch (error) {
@@ -88,6 +119,7 @@ const App: React.FC = () => {
           return <div className="p-4 text-red-600">Error loading comparison results: {String(error)}</div>;
         }
       default:
+        console.log('  -> default case, rendering DashboardPage');
         return <DashboardPage userRole={user!} history={history} />;
     }
   };
