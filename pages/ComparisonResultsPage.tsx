@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { SimulationSnapshot, Metric, LineChartDataPoint, BarChartDataPoint, WellBeingData, MultiLineChartDataPoint } from '../types';
 import ComparisonSummary from '../components/charts/ComparisonSummary';
+import ComparisonMetricChart from '../components/charts/ComparisonMetricChart';
 import GenericLineChart from '../components/charts/FarmerIncomeChart';
 import GenericBarChart from '../components/charts/InflationChart';
 import WellBeingHeatmap from '../components/charts/WellBeingHeatmap';
@@ -15,17 +16,25 @@ interface ComparisonResultsPageProps {
 const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }) => {
   const [activeTab, setActiveTab] = useState<'summary' | 'metrics' | 'details'>('summary');
 
-  // Get selected simulation IDs from session storage
-  const selectedIds = useMemo(() => {
+  // Debug: Check session storage
+  useEffect(() => {
     const selection = sessionStorage.getItem('comparisonSelection');
-    return selection ? JSON.parse(selection) : [];
+    console.log('ComparisonResultsPage - Session storage:', selection);
+    console.log('ComparisonResultsPage - History length:', history.length);
+    console.log('ComparisonResultsPage - History entries:', history.map(h => ({ id: h.id, status: h.status })));
+
+    // Clear session storage on mount
+    if (selection) {
+      sessionStorage.removeItem('comparisonSelection');
+    }
   }, []);
 
   // Convert history to snapshots
   const comparisonData: SimulationSnapshot[] = useMemo(() => {
-    return selectedIds
+    const result = selectedIds
       .map((id: string) => {
         const entry = history.find((h: any) => h.id === id);
+        console.log(`Finding entry for id ${id}:`, entry ? `Found - ${entry.inputs.policyName}` : 'Not found');
         if (entry && entry.status === 'completed' && entry.results) {
           return {
             id: entry.id,
@@ -39,14 +48,10 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
         return null;
       })
       .filter(Boolean) as SimulationSnapshot[];
-  }, [history, selectedIds]);
 
-  useEffect(() => {
-    // Clear the session storage after using
-    return () => {
-      sessionStorage.removeItem('comparisonSelection');
-    };
-  }, []);
+    console.log('ComparisonResultsPage - comparisonData:', result.length, 'snapshots');
+    return result;
+  }, [history, selectedIds]);
 
   const totalSnapshots = comparisonData.length;
 

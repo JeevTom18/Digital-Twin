@@ -57,11 +57,17 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
 
   const compareSelected = () => {
     const selectedIds = Array.from(selectedSnapshotIds);
+    console.log('CompareSelected called - Selected IDs:', selectedIds);
+    console.log('CompareSelected - History length:', history.length);
+
     if (selectedIds.length >= 2) {
-      sessionStorage.setItem('comparisonSelection', JSON.stringify(selectedIds));
+      const selectionString = JSON.stringify(selectedIds);
+      sessionStorage.setItem('comparisonSelection', selectionString);
+      console.log('Set session storage:', selectionString);
       window.location.hash = 'comparison-results';
+      console.log('Navigated to comparison-results');
     } else {
-      alert('Please select at least 2 simulations to compare.');
+      alert(`Please select at least 2 simulations to compare. Currently: ${selectedSnapshotIds.size}`);
     }
   };
 
