@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<UserRole | null>(null);
   const [page, setPage] = useState<string>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [history] = useLocalStorage<HistoryEntry[]>('simulationHistory', []);
+  const [history, setHistory] = useLocalStorage<HistoryEntry[]>('simulationHistory', []);
 
   const navigate = useCallback((newPage: string) => {
     window.location.hash = newPage;
@@ -63,26 +63,26 @@ const App: React.FC = () => {
   const renderPolicymakerPage = () => {
     const policymakerPages = new Set(['dashboard', 'policy-simulator', 'impact-analysis', 'stakeholder-reports', 'historical-analysis', 'comparison', 'comparison-results']);
     if (!policymakerPages.has(page)) {
-        return <DashboardPage userRole={user!} />;
+        return <DashboardPage userRole={user!} setHistory={setHistory} />;
     }
 
     switch (page) {
       case 'dashboard':
-        return <DashboardPage userRole={user!} />;
+        return <DashboardPage userRole={user!} setHistory={setHistory} />;
       case 'policy-simulator':
-        return <PolicySimulatorPage userRole={user!} />;
+        return <PolicySimulatorPage userRole={user!} setHistory={setHistory} />;
       case 'impact-analysis':
-        return <ImpactAnalysisPage />;
+        return <ImpactAnalysisPage setHistory={setHistory} />;
       case 'stakeholder-reports':
-        return <StakeholderReportsPage />;
+        return <StakeholderReportsPage setHistory={setHistory} />;
       case 'historical-analysis':
-        return <HistoricalAnalysisPage />;
+        return <HistoricalAnalysisPage setHistory={setHistory} />;
       case 'comparison':
-        return <ComparisonPage history={history} />;
+        return <ComparisonPage history={history} setHistory={setHistory} />;
       case 'comparison-results':
         return <ComparisonResultsPage history={history} />;
       default:
-        return <DashboardPage userRole={user!} />;
+        return <DashboardPage userRole={user!} setHistory={setHistory} />;
     }
   };
   

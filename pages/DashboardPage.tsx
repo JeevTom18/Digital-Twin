@@ -1,17 +1,16 @@
 import React, { useMemo } from 'react';
 import { UserRole, HistoryEntry } from '../types';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 import PageHeader from '../components/PageHeader';
 import RecentSimulations from '../components/RecentSimulations';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { PlusIcon, UsersIcon, WaveTrendIcon, TotalSimulationsIcon, ActiveSimulationsIcon, CompletedAnalysesIcon, UnderReviewIcon, ComparisonIcon } from '../components/icons';
-import { MOCK_HISTORY_DATA } from '../utils/mockData';
 import SummaryCard from '../components/SummaryCard';
 import PolicyFeed from '../components/PolicyFeed';
 
 interface DashboardProps {
   userRole: UserRole;
+  history: HistoryEntry[];
 }
 
 const ImpactOverviewItem: React.FC<{label: string, value: string, color: string}> = ({label, value, color}) => (
@@ -24,8 +23,7 @@ const ImpactOverviewItem: React.FC<{label: string, value: string, color: string}
     </div>
 );
 
-const DashboardPage: React.FC<DashboardProps> = ({ userRole }) => {
-    const [history] = useLocalStorage<HistoryEntry[]>('simulationHistory', MOCK_HISTORY_DATA);
+const DashboardPage: React.FC<DashboardProps> = ({ userRole, history }) => {
 
     const loadFromHistory = (entry: HistoryEntry) => {
         sessionStorage.setItem('selectedSimulationId', entry.id);

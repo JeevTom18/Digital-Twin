@@ -1,19 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SimulationSnapshot, HistoryEntry } from '../types';
 import ComparisonSummary from '../components/charts/ComparisonSummary';
 import ComparisonMetricChart from '../components/charts/ComparisonMetricChart';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { BackIcon, ComparisonIcon, SelectIcon } from '../components/icons';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface ComparisonPageProps {
   history: HistoryEntry[];
+  setHistory: (value: HistoryEntry[] | ((val: HistoryEntry[]) => HistoryEntry[])) => void;
 }
 
-const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
+const ComparisonPage: React.FC<ComparisonPageProps> = ({ history, setHistory }) => {
   const [selectedSnapshotIds, setSelectedSnapshotIds] = useState<Set<string>>(new Set());
-  const [activeMetric, setActiveMetric] = useState<string>('all');
 
   // Convert history to snapshots for comparison
   const comparisonData = useMemo(() => {
@@ -56,9 +55,19 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
   const compareSelected = () => {
     const selectedIds = Array.from(selectedSnapshotIds);
     if (selectedIds.length >= 2) {
-      // Store selection for the comparison page
+      // Store selection for the comparison results page
       sessionStorage.setItem('comparisonSelection', JSON.stringify(selectedIds));
-      window.location.hash = 'comparison';
+      // Navigate to comparison results page
+      window.location.hash = 'comparison-results';
+    } else {
+      alert('Please select at least 2 simulations to compare.');
+    }
+  };
+
+  // Show alert if trying to compare without enough simulations
+  const showCompareWarning = () => {
+    if (selectedSnapshotIds.size < 2) {
+      alert(`Please select at least 2 simulations. Currently selected: ${selectedSnapshotIds.size}`);
     }
   };
 
@@ -107,6 +116,9 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
           <div className="text-center py-12">
             <p className="text-slate-500 text-lg">No completed simulations available for comparison.</p>
             <p className="text-slate-400 mt-2">Create simulations first to compare them.</p>
+            {history.length > 0 && (
+              <p className="text-slate-600 mt-4 text-sm">Total history entries: {history.length}</p>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -2,7 +2,14 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { SimulationInput, SimulationResult, Metric, LineChartDataPoint, BarChartDataPoint, WellBeingData, MultiLineChartDataPoint } from '../types';
 import { INDIAN_STATES } from '../constants';
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDk1Oqj5QLOk9SsbgW2tP2IvHgbuzDU4K0" as string });
+// Get API key from environment variable for security
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || "";
+
+if (!apiKey) {
+  console.warn("Warning: GEMINI_API_KEY not configured. Please set VITE_GEMINI_API_KEY or GEMINI_API_KEY in your .env file.");
+}
+
+const ai = new GoogleGenAI({ apiKey: apiKey as string });
 
 const getPolicySpecificMetrics = (policyType: string) => {
     let promptFragment = '';
