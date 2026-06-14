@@ -66,7 +66,85 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
   }
 
   const renderLineChart = () => {
-    // Flatten data for comparison - merge all snapshot data points
+    // Check if this is MultiLineChartDataPoint (has urban/rural or multiple keys)
+    const isMultiLineData = Array.isArray(data) && data.length > 0 &&
+      Object.keys(data[0]).filter(k => k !== 'year').length > 1;
+
+    if (isMultiLineData) {
+      // For MultiLine Data (like Life Expectancy with urban/rural), show separate lines for each metric
+      // Each snapshot has the same year/rural/urban structure, just different values
+      const years = Array.from(new Set((data as any[]).map((d: any) => d.year)));
+      const metricKeys = Object.keys((data as any)[0]).filter(k => k !== 'year');
+
+      const chartDataPoints = years.map(year => {
+        const point: any = { year };
+
+        // Add all metric keys for ALL snapshots (urban for s1, urban for s2, rural for s1, rural for s2)
+        snapshots.forEach((snapshot) => {
+          const dataPoint = (data as any[]).find((d: any) => d.year === year);
+          if (dataPoint) {
+            metricKeys.forEach(key => {
+              // Use format: "policyName - metric" like "Healthcare - Urban"
+              point[`${snapshot.inputs.policyName} - ${key.charAt(0).toUpperCase() + key.slice(1)}`] = dataPoint[key];
+            });
+          }
+        });
+
+        return point;
+      });
+
+      // Generate colors for each metric type
+      const colors: { [key: string]: string } = {};
+      let colorIdx = 0;
+      const colorPalette = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+      snapshots.forEach((snapshot) => {
+        metricKeys.forEach(key => {
+          const keyName = `${snapshot.inputs.policyName} - ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+          colors[keyName] = colorPalette[colorIdx % colorPalette.length];
+          colorIdx++;
+        });
+      });
+
+      return (
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart data={chartDataPoints} margin={{ top: 5, right: 30, left: 20, bottom: 25 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="year"
+              label={{ value: 'Year', position: 'insideBottom', offset: -5 }}
+              padding={{ left: 30, right: 30 }}
+            />
+            <YAxis
+              label={{ value: unit || 'Value', angle: -90, position: 'insideLeft' }}
+            />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+              formatter={(value: number, name: any) => [`${value.toFixed(1)} ${unit || ''}`, name]}
+            />
+            {showLegend && <Legend />}
+            {snapshots.map((snapshot) =>
+              metricKeys.map(key => {
+                const lineKey = `${snapshot.inputs.policyName} - ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                return (
+                  <Line
+                    key={lineKey}
+                    type="monotone"
+                    dataKey={lineKey}
+                    stroke={colors[lineKey] || '#3b82f6'}
+                    strokeWidth={2}
+                    dot={{ r: 5, strokeWidth: 2 }}
+                    activeDot={{ r: 6 }}
+                  />
+                );
+              })
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    // For regular LineChartDataPoint (single value per year)
     const years = Array.from(new Set((data as LineChartDataPoint[]).map((d: LineChartDataPoint) => d.year)));
 
     const chartDataPoints = years.map(year => {
@@ -75,7 +153,6 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
       snapshots.forEach((snapshot) => {
         const dataPoint = (data as LineChartDataPoint[]).find((d: LineChartDataPoint) => d.year === year);
         if (dataPoint) {
-          // Use policy name as the key for comparison
           point[snapshot.inputs.policyName] = dataPoint.value as number;
         }
       });
