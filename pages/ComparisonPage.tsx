@@ -11,15 +11,42 @@ interface ComparisonPageProps {
 const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
   const [selectedSnapshotIds, setSelectedSnapshotIds] = useState<Set<string>>(new Set());
 
-  // Debug log history
+  // Debug log everything
   useEffect(() => {
-    console.log('ComparisonPage received history:', history.length, 'entries');
-    console.log('History entries:', history.map(h => ({ id: h.id, status: h.status, hasResults: !!h.results })));
+    console.log('==== COMPARISON PAGE RENDER ====');
+    console.log('history props:', history.length, 'entries');
+    console.log('selectedSnapshotIds:', selectedSnapshotIds);
+    console.log('comparisonData.length:', comparisonData.length);
+    console.log('Button visible?', selectedSnapshotIds.size >= 2);
+  });
+
+  useEffect(() => {
+    if (history.length > 0) {
+      console.log('ComparisonPage received history:', history.length, 'entries');
+      console.log('History entries:', history.map(h => ({
+        id: h.id.substring(0, 20) + '...',
+        status: h.status,
+        hasResults: !!h.results,
+        name: h.inputs?.policyName || 'N/A'
+      })));
+    }
   }, [history]);
 
   // Convert history to snapshots for comparison
   const comparisonData = useMemo(() => {
-    const filtered = history.filter(entry => entry.status === 'completed' && entry.results);
+    if (!history || history.length === 0) {
+      console.log('No history available in comparisonData');
+      return [];
+    }
+
+    const filtered = history.filter(entry => {
+      const hasResults = entry.status === 'completed' && entry.results;
+      if (hasResults) {
+        console.log(`Entry qualifies: ${entry.inputs.policyName}`);
+      }
+      return entry.status === 'completed' && entry.results;
+    });
+
     console.log('ComparisonPage - Filtered to completed with results:', filtered.length);
     filtered.forEach(s => console.log(`- ${s.inputs.policyName}`));
 
@@ -56,18 +83,26 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
   };
 
   const compareSelected = () => {
+    console.log('==== COMPARE BUTTON CLICKED ====');
+    console.log('selectedSnapshotIds:', selectedSnapshotIds);
+    console.log('selectedSnapshotIds.size:', selectedSnapshotIds.size);
     const selectedIds = Array.from(selectedSnapshotIds);
-    console.log('CompareSelected called - Selected IDs:', selectedIds);
-    console.log('CompareSelected - History length:', history.length);
+    console.log('Selected IDs array:', selectedIds);
+    console.log('History length:', history.length);
 
     if (selectedIds.length >= 2) {
       const selectionString = JSON.stringify(selectedIds);
       sessionStorage.setItem('comparisonSelection', selectionString);
-      console.log('Set session storage:', selectionString);
+      console.log('✅ Set session storage:', selectionString);
+      console.log('Navigating to comparison-results...');
       window.location.hash = 'comparison-results';
-      console.log('Navigated to comparison-results');
+      console.log('Hash changed to:', window.location.hash);
+      setTimeout(() => {
+        console.log('Current hash after timeout:', window.location.hash);
+      }, 100);
     } else {
       alert(`Please select at least 2 simulations to compare. Currently: ${selectedSnapshotIds.size}`);
+      console.log('❌ Not enough selections:', selectedSnapshotIds.size);
     }
   };
 
@@ -238,9 +273,20 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
         )}
       </Card>
 
+      <div className="mb-4 p-4 bg-gray-50 rounded">
+        <p><strong>Debug Info:</strong></p>
+        <p>History length: {history?.length || 0}</p>
+        <p>comparisonData.length: {comparisonData.length}</p>
+        <p>selectedSnapshotIds.size: {selectedSnapshotIds.size}</p>
+        <p>Button should be visible: {selectedSnapshotIds.size >= 2 ? 'YES' : 'NO (need 2+)'}</p>
+      </div>
+
       {selectedSnapshotIds.size >= 2 && (
         <div className="mt-6 flex justify-center">
-          <Button onClick={compareSelected} className="px-8 py-3 text-lg">
+          <Button onClick={() => {
+            console.log('==== BUTTON CLICK HANDLER ====');
+            compareSelected();
+          }} className="px-8 py-3 text-lg" data-testid="compare-button">
             <ComparisonIcon className="w-5 h-5 mr-2" />
             Compare Selected ({selectedSnapshotIds.size} simulations)
           </Button>
