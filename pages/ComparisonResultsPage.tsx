@@ -17,24 +17,40 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
   const [activeTab, setActiveTab] = useState<'summary' | 'metrics' | 'details'>('summary');
 
   // Debug: Check session storage
+  const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
+
   useEffect(() => {
     const selection = sessionStorage.getItem('comparisonSelection');
     console.log('ComparisonResultsPage - Session storage:', selection);
     console.log('ComparisonResultsPage - History length:', history.length);
     console.log('ComparisonResultsPage - History entries:', history.map(h => ({ id: h.id, status: h.status })));
 
-    // Clear session storage on mount
+    // Parse selected IDs
     if (selection) {
-      sessionStorage.removeItem('comparisonSelection');
+      try {
+        const parsed = JSON.parse(selection);
+        console.log('Selected IDs parsed:', parsed);
+        setSelectedIds(parsed);
+
+        // Clear session storage after reading
+        sessionStorage.removeItem('comparisonSelection');
+      } catch (e) {
+        console.error('Failed to parse session storage:', e);
+      }
     }
   }, []);
 
   // Convert history to snapshots
   const comparisonData: SimulationSnapshot[] = useMemo(() => {
+    console.log('ComparisonResultsPage - selectedIds:', selectedIds, 'length:', selectedIds.length);
+    if (selectedIds.length === 0) {
+      return [];
+    }
+
     const result = selectedIds
       .map((id: string) => {
         const entry = history.find((h: any) => h.id === id);
-        console.log(`Finding entry for id ${id}:`, entry ? `Found - ${entry.inputs.policyName}` : 'Not found');
+        console.log(`Finding entry for id ${id.substring(0, 20)}...:`, entry ? `Found - ${entry.inputs.policyName}` : 'Not found');
         if (entry && entry.status === 'completed' && entry.results) {
           return {
             id: entry.id,
