@@ -17,6 +17,7 @@ Built with React, TypeScript, Vite, and Google Gemini AI APIs, DigiTwin of Democ
 ## Features
 
 ### Policymaker Dashboard
+
 - **Custom Policy Simulator**: Create and configure policy scenarios with detailed parameters
 - **Impact Analysis**: AI-generated predictions for economic, social, and environmental outcomes
 - **Historical Analysis**: Compare policy impacts against historical economic and social data
@@ -25,12 +26,14 @@ Built with React, TypeScript, Vite, and Google Gemini AI APIs, DigiTwin of Democ
 - **Data Visualization**: Interactive charts for metrics like GDP growth, employment, inflation, literacy, and healthcare access
 
 ### Public Portal
+
 - **Policy Explorer**: Browse predefined policy scenarios across different domains
 - **Impact Visualizations**: See projected outcomes for citizens
 - **Reports Library**: Access transparent, easy-to-understand policy impact summaries
 - **Learn Hub**: Educational resources about policy-making and economic indicators
 
 ### Core Technologies
+
 - Google Gemini AI integration for simulation predictions
 - Interactive Recharts visualizations
 - Tailwind CSS responsive design
@@ -43,6 +46,7 @@ Built with React, TypeScript, Vite, and Google Gemini AI APIs, DigiTwin of Democ
 ## Technologies Used
 
 ### Frontend
+
 - **React** 19.x - UI framework
 - **TypeScript** 5.8.x - Type-safe development
 - **Vite** 6.2.x - Build tool and dev server
@@ -50,6 +54,7 @@ Built with React, TypeScript, Vite, and Google Gemini AI APIs, DigiTwin of Democ
 - **Recharts** 2.12.x - Chart visualization library
 
 ### AI & Integration
+
 - **@google/genai** 1.19.x - Google Gemini API client
 - **Vite** - Development server and bundler
 
@@ -113,12 +118,14 @@ The application uses a simple but effective role-based access system:
 ## Simulation Parameters
 
 ### Policy Parameters
+
 - **Budget Allocation**: In Crores (INR)
 - **Target Coverage**: Percentage of population to benefit
 - **Implementation Timeline**: e.g., "1 year", "3 years"
 - **Geographic Scope**: Regional, State, or National
 
 ### Fine-Tuning Parameters
+
 - **Economic Model**: Optimistic, Neutral, or Pessimistic projections
 - **Social Adoption Rate**: Expected citizen participation percentage
 - **Climate Impact**: Score on 0-100 scale
@@ -130,6 +137,7 @@ The application uses a simple but effective role-based access system:
 ## Output Metrics
 
 Each simulation produces:
+
 - **Economic Impact**: Percentage change in GDP, employment, etc.
 - **Social Impact**: Score on 0-10 scale
 - **Environmental Impact**: Percentage change in key indicators
