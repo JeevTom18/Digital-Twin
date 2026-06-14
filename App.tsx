@@ -81,7 +81,12 @@ const App: React.FC = () => {
       case 'comparison':
         return <ComparisonPage history={history} />;
       case 'comparison-results':
-        return <ComparisonResultsPage history={history} />;
+        try {
+          return <ComparisonResultsPage history={history} />;
+        } catch (error) {
+          console.error('Error rendering ComparisonResultsPage:', error);
+          return <div className="p-4 text-red-600">Error loading comparison results: {String(error)}</div>;
+        }
       default:
         return <DashboardPage userRole={user!} history={history} />;
     }

@@ -95,6 +95,13 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
 
       {activeTab === 'metrics' && (
         <div className="space-y-6">
+          <div className="p-4 bg-blue-50 rounded">
+            <h3 className="font-bold text-slate-800">Metrics Debug:</h3>
+            <p>comparisonData.length: {comparisonData.length}</p>
+            <p>comparisonData: {JSON.stringify(comparisonData)}</p>
+            <p>Total simulations with detailedMetrics: {comparisonData.filter(s => s.results?.detailedMetrics?.length).length}</p>
+          </div>
+
           {comparisonData.length < 2 ? (
             <Card>
               <p className="text-slate-500 text-center py-8">
@@ -102,21 +109,22 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
               </p>
             </Card>
           ) : (
-            comparisonData.flatMap(snapshot =>
-              snapshot.results?.detailedMetrics || []
-            )
-            .filter((metric, index, self) =>
-              index === self.findIndex(m => JSON.stringify(m) === JSON.stringify(metric))
-            )
-            .map((metric: Metric, idx: number) => (
-              <Card key={idx}>
-                <ComparisonMetricChart
-                  metric={metric}
-                  snapshots={comparisonData}
-                  showLegend={true}
-                />
-              </Card>
-            ))
+            <>
+              {comparisonData.flatMap(snapshot =>
+                snapshot.results?.detailedMetrics || []
+              )
+              .filter((metric, index, self) =>
+                index === self.findIndex(m => JSON.stringify(m) === JSON.stringify(metric))
+              ).map((metric: Metric, idx: number) => (
+                <Card key={idx}>
+                  <ComparisonMetricChart
+                    metric={metric}
+                    snapshots={comparisonData}
+                    showLegend={true}
+                  />
+                </Card>
+              ))}
+            </>
           )}
         </div>
       )}
