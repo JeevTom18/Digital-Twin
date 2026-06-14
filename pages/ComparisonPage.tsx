@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SimulationSnapshot, HistoryEntry } from '../types';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -11,17 +11,25 @@ interface ComparisonPageProps {
 const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
   const [selectedSnapshotIds, setSelectedSnapshotIds] = useState<Set<string>>(new Set());
 
+  // Debug log history
+  useEffect(() => {
+    console.log('ComparisonPage received history:', history.length, 'entries');
+    console.log('History entries:', history.map(h => ({ id: h.id, status: h.status, hasResults: !!h.results })));
+  }, [history]);
+
   // Convert history to snapshots for comparison
   const comparisonData = useMemo(() => {
-    return history
-      .filter(entry => entry.status === 'completed' && entry.results)
-      .map(entry => ({
-        id: entry.id,
-        timestamp: entry.timestamp,
-        inputs: entry.inputs,
-        results: entry.results,
-        isSelected: selectedSnapshotIds.has(entry.id),
-      }));
+    const filtered = history.filter(entry => entry.status === 'completed' && entry.results);
+    console.log('ComparisonPage - Filtered to completed with results:', filtered.length);
+    filtered.forEach(s => console.log(`- ${s.inputs.policyName}`));
+
+    return filtered.map(entry => ({
+      id: entry.id,
+      timestamp: entry.timestamp,
+      inputs: entry.inputs,
+      results: entry.results,
+      isSelected: selectedSnapshotIds.has(entry.id),
+    }));
   }, [history, selectedSnapshotIds]);
 
   const toggleSelection = (id: string) => {

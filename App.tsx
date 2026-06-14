@@ -39,6 +39,13 @@ const App: React.FC = () => {
     console.log('App: history changed, length:', history.length);
   }, [history]);
 
+  // Debug: Show available simulations
+  useEffect(() => {
+    const completed = history.filter(h => h.status === 'completed' && h.results);
+    console.log('Available simulations for comparison:', completed.length);
+    completed.forEach(s => console.log(`- ${s.inputs.policyName}`));
+  }, [history]);
+
   const handleLogin = (role: UserRole) => {
     setUser(role);
     if (role === UserRole.Policymaker) {
@@ -62,21 +69,21 @@ const App: React.FC = () => {
 
     switch (page) {
       case 'dashboard':
-        return <DashboardPage userRole={user!} />;
+        return <DashboardPage userRole={user!} history={history} />;
       case 'policy-simulator':
-        return <PolicySimulatorPage userRole={user!} setHistory={setHistory} />;
+        return <PolicySimulatorPage userRole={user!} setHistory={setHistory} history={history} />;
       case 'impact-analysis':
-        return <ImpactAnalysisPage />;
+        return <ImpactAnalysisPage history={history} />;
       case 'stakeholder-reports':
-        return <StakeholderReportsPage />;
+        return <StakeholderReportsPage history={history} />;
       case 'historical-analysis':
-        return <HistoricalAnalysisPage />;
+        return <HistoricalAnalysisPage history={history} />;
       case 'comparison':
         return <ComparisonPage history={history} />;
       case 'comparison-results':
         return <ComparisonResultsPage history={history} />;
       default:
-        return <DashboardPage userRole={user!} />;
+        return <DashboardPage userRole={user!} history={history} />;
     }
   };
   

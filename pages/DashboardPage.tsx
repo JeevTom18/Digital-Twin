@@ -9,45 +9,9 @@ import { PlusIcon, UsersIcon, WaveTrendIcon, TotalSimulationsIcon, ActiveSimulat
 import SummaryCard from '../components/SummaryCard';
 import PolicyFeed from '../components/PolicyFeed';
 
-const MOCK_HISTORY_DATA: HistoryEntry[] = [
-  {
-    id: 'mock-1',
-    timestamp: new Date().toLocaleString(),
-    status: 'completed',
-    inputs: {
-      policyName: 'National Health Mission',
-      policyType: 'Healthcare & Family Welfare',
-      policyDescription: 'Sample policy',
-      parameters: {
-        budgetAllocation: 50000,
-        targetCoverage: 80,
-        implementationTimeline: '3 years',
-        geographicScope: 'National'
-      }
-    },
-    results: { economicImpact: 2.5, socialImpact: 7.8, environmentalImpact: 1.2, confidence: 82, summary: 'Sample', detailedMetrics: [] }
-  },
-  {
-    id: 'mock-2',
-    timestamp: new Date().toLocaleString(),
-    status: 'completed',
-    inputs: {
-      policyName: 'Digital Education Initiative',
-      policyType: 'Education & Skilling',
-      policyDescription: 'Sample policy',
-      parameters: {
-        budgetAllocation: 30000,
-        targetCoverage: 75,
-        implementationTimeline: '2 years',
-        geographicScope: 'National'
-      }
-    },
-    results: { economicImpact: 1.8, socialImpact: 8.2, environmentalImpact: 0.5, confidence: 78, summary: 'Sample', detailedMetrics: [] }
-  }
-];
-
 interface DashboardProps {
   userRole: UserRole;
+  history: HistoryEntry[];
 }
 
 const ImpactOverviewItem: React.FC<{label: string, value: string, color: string}> = ({label, value, color}) => (
@@ -60,8 +24,7 @@ const ImpactOverviewItem: React.FC<{label: string, value: string, color: string}
     </div>
 );
 
-const DashboardPage: React.FC<DashboardProps> = ({ userRole }) => {
-    const [history] = useLocalStorage<HistoryEntry[]>('simulationHistory', MOCK_HISTORY_DATA);
+const DashboardPage: React.FC<DashboardProps> = ({ userRole, history }) => {
 
     const loadFromHistory = (entry: HistoryEntry) => {
         sessionStorage.setItem('selectedSimulationId', entry.id);

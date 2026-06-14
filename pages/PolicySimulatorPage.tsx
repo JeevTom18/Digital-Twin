@@ -20,6 +20,8 @@ import ResultSummaryCard from '../components/ui/ResultSummaryCard';
 
 interface PolicySimulatorPageProps {
   userRole: UserRole;
+  setHistory: (value: HistoryEntry[] | ((val: HistoryEntry[]) => HistoryEntry[])) => void;
+  history: HistoryEntry[];
 }
 
 const initialInputs: SimulationInput = {
@@ -41,13 +43,12 @@ const initialInputs: SimulationInput = {
     }
 };
 
-const PolicySimulatorPage: React.FC<PolicySimulatorPageProps> = ({ userRole }) => {
+const PolicySimulatorPage: React.FC<PolicySimulatorPageProps> = ({ userRole, setHistory }) => {
   const [activeTab, setActiveTab] = useState('configure');
   const [inputs, setInputs] = useState<SimulationInput>(initialInputs);
   const [results, setResults] = useState<SimulationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [history, setHistory] = useLocalStorage<HistoryEntry[]>('simulationHistory', []);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -84,7 +85,7 @@ const PolicySimulatorPage: React.FC<PolicySimulatorPageProps> = ({ userRole }) =
     try {
       const simulationResult = await simulatePolicyImpact(inputs);
       setResults(simulationResult);
-      
+
       const newHistoryEntry: HistoryEntry = {
         id: new Date().toISOString(),
         timestamp: new Date().toLocaleString(),
@@ -93,6 +94,7 @@ const PolicySimulatorPage: React.FC<PolicySimulatorPageProps> = ({ userRole }) =
         results: simulationResult,
       };
       setHistory(prevHistory => [newHistoryEntry, ...prevHistory.slice(0, 9)]);
+      console.log('Simulation added to history:', simulationResult.summary);
 
     } catch (err: any) {
       setError(err.message || 'An unknown error occurred.');
