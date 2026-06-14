@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { UserRole } from './types';
+import { UserRole, HistoryEntry } from './types';
 import Login from './components/Login';
 import MobileHeader from './components/MobileHeader';
+import { useLocalStorage } from './hooks/useLocalStorage';
 
 // Policymaker imports
 import Sidebar from './components/Sidebar';
@@ -10,6 +11,8 @@ import PolicySimulatorPage from './pages/PolicySimulatorPage';
 import ImpactAnalysisPage from './pages/ImpactAnalysisPage';
 import StakeholderReportsPage from './pages/StakeholderReportsPage';
 import HistoricalAnalysisPage from './pages/HistoricalAnalysisPage';
+import ComparisonPage from './pages/ComparisonPage';
+import ComparisonResultsPage from './pages/ComparisonResultsPage';
 
 // Public user imports
 import PublicSidebar from './components/public/PublicSidebar';
@@ -23,11 +26,12 @@ const App: React.FC = () => {
   const [user, setUser] = useState<UserRole | null>(null);
   const [page, setPage] = useState<string>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [history] = useLocalStorage<HistoryEntry[]>('simulationHistory', []);
 
   const navigate = useCallback((newPage: string) => {
     window.location.hash = newPage;
     setPage(newPage);
-    setIsSidebarOpen(false); // Close sidebar on navigation
+    setIsSidebarOpen(false);
   }, []);
 
   useEffect(() => {
@@ -37,7 +41,7 @@ const App: React.FC = () => {
       setPage(hash);
     };
     window.addEventListener('hashchange', handleHashChange);
-    handleHashChange(); // Initial page load
+    handleHashChange();
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [user]);
 
@@ -57,11 +61,11 @@ const App: React.FC = () => {
   };
 
   const renderPolicymakerPage = () => {
-    const policymakerPages = new Set(['dashboard', 'policy-simulator', 'impact-analysis', 'stakeholder-reports', 'historical-analysis']);
+    const policymakerPages = new Set(['dashboard', 'policy-simulator', 'impact-analysis', 'stakeholder-reports', 'historical-analysis', 'comparison', 'comparison-results']);
     if (!policymakerPages.has(page)) {
         return <DashboardPage userRole={user!} />;
     }
-    
+
     switch (page) {
       case 'dashboard':
         return <DashboardPage userRole={user!} />;
@@ -73,6 +77,10 @@ const App: React.FC = () => {
         return <StakeholderReportsPage />;
       case 'historical-analysis':
         return <HistoricalAnalysisPage />;
+      case 'comparison':
+        return <ComparisonPage history={history} />;
+      case 'comparison-results':
+        return <ComparisonResultsPage history={history} />;
       default:
         return <DashboardPage userRole={user!} />;
     }

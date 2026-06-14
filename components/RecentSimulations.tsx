@@ -1,7 +1,7 @@
 import React from 'react';
 import { HistoryEntry } from '../types';
 import Card from './ui/Card';
-import { DraftIcon, CompletedAnalysesIcon } from './icons';
+import { DraftIcon, CompletedAnalysesIcon, ComparisonIcon } from './icons';
 
 interface RecentSimulationsProps {
   history: HistoryEntry[];
@@ -48,6 +48,8 @@ const MetricDisplay: React.FC<{label: string, value: string}> = ({ label, value 
 );
 
 const RecentSimulations: React.FC<RecentSimulationsProps> = ({ history, onSelect }) => {
+  const completedCount = history.filter(h => h.status === 'completed').length;
+
   return (
     <Card className="h-full">
       <div className="flex justify-between items-center mb-4">
@@ -55,9 +57,19 @@ const RecentSimulations: React.FC<RecentSimulationsProps> = ({ history, onSelect
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-slate-500"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg>
             Recent Simulations
         </h2>
-        <button className="text-slate-500 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100">
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.location.hash = 'comparison'}
+            disabled={completedCount < 2}
+            className="flex items-center text-slate-500 hover:text-blue-600 p-1.5 rounded-full hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            title={completedCount < 2 ? 'Need at least 2 completed simulations to compare' : 'Compare Simulations'}
+          >
+            <ComparisonIcon className="w-5 h-5" />
+          </button>
+          <button className="text-slate-500 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-        </button>
+          </button>
+        </div>
       </div>
       {history.length === 0 ? (
         <div className="text-center py-12">

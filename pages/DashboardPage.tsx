@@ -5,7 +5,7 @@ import PageHeader from '../components/PageHeader';
 import RecentSimulations from '../components/RecentSimulations';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { PlusIcon, UsersIcon, WaveTrendIcon, TotalSimulationsIcon, ActiveSimulationsIcon, CompletedAnalysesIcon, UnderReviewIcon } from '../components/icons';
+import { PlusIcon, UsersIcon, WaveTrendIcon, TotalSimulationsIcon, ActiveSimulationsIcon, CompletedAnalysesIcon, UnderReviewIcon, ComparisonIcon } from '../components/icons';
 import { MOCK_HISTORY_DATA } from '../utils/mockData';
 import SummaryCard from '../components/SummaryCard';
 import PolicyFeed from '../components/PolicyFeed';
@@ -59,9 +59,19 @@ const DashboardPage: React.FC<DashboardProps> = ({ userRole }) => {
                 title="Policy Simulation Dashboard"
                 subtitle="DigiTwin of India's Democracy - Simulate before you legislate"
             >
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => window.location.hash = 'comparison'}
+                  disabled={completedCount < 2}
+                  variant="secondary"
+                  icon={<ComparisonIcon />}
+                >
+                  Compare
+                </Button>
                 <Button onClick={() => window.location.hash = 'policy-simulator'} icon={<PlusIcon />}>
                     New Simulation
                 </Button>
+              </div>
             </PageHeader>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">

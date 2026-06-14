@@ -108,3 +108,13 @@ export interface FAQItem {
   question: string;
   answer: string;
 }
+
+// Types for Scenario Comparison
+export interface SimulationSnapshot {
+  id: string;
+  entryId: string;
+  timestamp: string;
+  inputs: SimulationInput;
+  results?: SimulationResult;
+  isSelected: boolean;
+}

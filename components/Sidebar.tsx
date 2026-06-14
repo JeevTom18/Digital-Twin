@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserRole } from '../types';
-import { Logo, DashboardIcon, SimulatorIcon, ImpactIcon, StakeholderIcon, HistoryIcon, LogoutIcon } from './icons';
+import { Logo, DashboardIcon, SimulatorIcon, ImpactIcon, StakeholderIcon, HistoryIcon, LogoutIcon, ComparisonIcon } from './icons';
 
 interface SidebarProps {
   userRole: UserRole | null;
@@ -41,6 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userRole, currentPage, onNavigate, on
     { page: 'dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
     { page: 'policy-simulator', icon: <SimulatorIcon />, label: 'Policy Simulator' },
     { page: 'impact-analysis', icon: <ImpactIcon />, label: 'Impact Analysis' },
+    { page: 'comparison', icon: <ComparisonIcon />, label: 'Scenario Comparison' },
     { page: 'stakeholder-reports', icon: <StakeholderIcon />, label: 'Stakeholder Reports' },
     { page: 'historical-analysis', icon: <HistoryIcon />, label: 'Historical Analysis' },
   ];
