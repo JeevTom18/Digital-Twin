@@ -23,7 +23,13 @@ import ReportsLibraryPage from './pages/public/ReportsLibraryPage';
 import LearnPage from './pages/public/LearnPage';
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<UserRole | null>(null);
+  // Persist user role in localStorage
+  const getStoredUser = (): UserRole | null => {
+    const stored = localStorage.getItem('userRole');
+    return stored ? (stored as UserRole) : null;
+  };
+
+  const [user, setUser] = useState<UserRole | null>(getStoredUser());
   const [page, setPage] = useState<string>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [history, setHistory] = useLocalStorage<HistoryEntry[]>('simulationHistory', []);
@@ -39,6 +45,7 @@ const App: React.FC = () => {
       const defaultPage = user === UserRole.Public ? 'public-dashboard' : 'dashboard';
       const hash = window.location.hash.replace('#', '') || defaultPage;
 
+      // Debug logs - remove these in production
       console.log('Hash changed!');
       console.log('- window.location.hash:', window.location.hash);
       console.log('- processed hash:', hash);
@@ -69,6 +76,8 @@ const App: React.FC = () => {
   }, [history]);
 
   const handleLogin = (role: UserRole) => {
+    // Persist user role in localStorage
+    localStorage.setItem('userRole', role);
     setUser(role);
     if (role === UserRole.Policymaker) {
         window.location.hash = 'dashboard';
@@ -78,6 +87,8 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
+    // Clear stored user role
+    localStorage.removeItem('userRole');
     setUser(null);
     setIsSidebarOpen(false);
     window.location.hash = '';
