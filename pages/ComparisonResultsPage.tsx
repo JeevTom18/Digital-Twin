@@ -16,23 +16,13 @@ interface ComparisonResultsPageProps {
 const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }) => {
   const [activeTab, setActiveTab] = useState<'summary' | 'metrics' | 'details'>('summary');
 
-  // Debug: Check session storage
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
 
   useEffect(() => {
     const selection = sessionStorage.getItem('comparisonSelection');
-    console.log('ComparisonResultsPage - Session storage:', selection);
-    console.log('ComparisonResultsPage - History length:', history.length);
-    console.log('ComparisonResultsPage - History entries:', history.map(h => ({ id: h.id, status: h.status })));
-
-    // Parse selected IDs
     if (selection) {
       try {
-        const parsed = JSON.parse(selection);
-        console.log('Selected IDs parsed:', parsed);
-        setSelectedIds(parsed);
-
-        // Clear session storage after reading
+        setSelectedIds(JSON.parse(selection));
         sessionStorage.removeItem('comparisonSelection');
       } catch (e) {
         console.error('Failed to parse session storage:', e);
@@ -40,9 +30,7 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
     }
   }, []);
 
-  // Convert history to snapshots
   const comparisonData: SimulationSnapshot[] = useMemo(() => {
-    console.log('ComparisonResultsPage - selectedIds:', selectedIds, 'length:', selectedIds.length);
     if (selectedIds.length === 0) {
       return [];
     }
@@ -50,7 +38,6 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
     const result = selectedIds
       .map((id: string) => {
         const entry = history.find((h: any) => h.id === id);
-        console.log(`Finding entry for id ${id.substring(0, 20)}...:`, entry ? `Found - ${entry.inputs.policyName}` : 'Not found');
         if (entry && entry.status === 'completed' && entry.results) {
           return {
             id: entry.id,
@@ -65,7 +52,6 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
       })
       .filter(Boolean) as SimulationSnapshot[];
 
-    console.log('ComparisonResultsPage - comparisonData:', result.length, 'snapshots');
     return result;
   }, [history, selectedIds]);
 
@@ -111,13 +97,6 @@ const ComparisonResultsPage: React.FC<ComparisonResultsPageProps> = ({ history }
 
       {activeTab === 'metrics' && (
         <div className="space-y-6">
-          <div className="p-4 bg-blue-50 rounded">
-            <h3 className="font-bold text-slate-800">Metrics Debug:</h3>
-            <p>comparisonData.length: {comparisonData.length}</p>
-            <p>comparisonData: {JSON.stringify(comparisonData)}</p>
-            <p>Total simulations with detailedMetrics: {comparisonData.filter(s => s.results?.detailedMetrics?.length).length}</p>
-          </div>
-
           {comparisonData.length < 2 ? (
             <Card>
               <p className="text-slate-500 text-center py-8">
