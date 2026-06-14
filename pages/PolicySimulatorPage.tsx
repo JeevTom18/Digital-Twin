@@ -20,7 +20,6 @@ import ResultSummaryCard from '../components/ui/ResultSummaryCard';
 
 interface PolicySimulatorPageProps {
   userRole: UserRole;
-  setHistory: (value: HistoryEntry[] | ((val: HistoryEntry[]) => HistoryEntry[])) => void;
 }
 
 const initialInputs: SimulationInput = {
@@ -42,21 +41,13 @@ const initialInputs: SimulationInput = {
     }
 };
 
-const PolicySimulatorPage: React.FC<PolicySimulatorPageProps> = ({ userRole, setHistory }) => {
+const PolicySimulatorPage: React.FC<PolicySimulatorPageProps> = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState('configure');
   const [inputs, setInputs] = useState<SimulationInput>(initialInputs);
   const [results, setResults] = useState<SimulationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Load selected simulation from session storage
-  useEffect(() => {
-    const selectedId = sessionStorage.getItem('selectedSimulationId');
-    if (selectedId) {
-      // This will be loaded when history prop is available
-      sessionStorage.removeItem('selectedSimulationId');
-    }
-  }, []);
+  const [history, setHistory] = useLocalStorage<HistoryEntry[]>('simulationHistory', []);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

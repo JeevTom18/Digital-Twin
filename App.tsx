@@ -34,16 +34,10 @@ const App: React.FC = () => {
     setIsSidebarOpen(false);
   }, []);
 
+  // Force re-render when history changes
   useEffect(() => {
-    const handleHashChange = () => {
-      const defaultPage = user === UserRole.Public ? 'public-dashboard' : 'dashboard';
-      const hash = window.location.hash.replace('#', '') || defaultPage;
-      setPage(hash);
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    handleHashChange();
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [user]);
+    console.log('App: history changed, length:', history.length);
+  }, [history]);
 
   const handleLogin = (role: UserRole) => {
     setUser(role);
@@ -63,26 +57,26 @@ const App: React.FC = () => {
   const renderPolicymakerPage = () => {
     const policymakerPages = new Set(['dashboard', 'policy-simulator', 'impact-analysis', 'stakeholder-reports', 'historical-analysis', 'comparison', 'comparison-results']);
     if (!policymakerPages.has(page)) {
-        return <DashboardPage userRole={user!} setHistory={setHistory} />;
+      return <DashboardPage userRole={user!} />;
     }
 
     switch (page) {
       case 'dashboard':
-        return <DashboardPage userRole={user!} setHistory={setHistory} />;
+        return <DashboardPage userRole={user!} />;
       case 'policy-simulator':
         return <PolicySimulatorPage userRole={user!} setHistory={setHistory} />;
       case 'impact-analysis':
-        return <ImpactAnalysisPage setHistory={setHistory} />;
+        return <ImpactAnalysisPage />;
       case 'stakeholder-reports':
-        return <StakeholderReportsPage setHistory={setHistory} />;
+        return <StakeholderReportsPage />;
       case 'historical-analysis':
-        return <HistoricalAnalysisPage setHistory={setHistory} />;
+        return <HistoricalAnalysisPage />;
       case 'comparison':
-        return <ComparisonPage history={history} setHistory={setHistory} />;
+        return <ComparisonPage history={history} />;
       case 'comparison-results':
         return <ComparisonResultsPage history={history} />;
       default:
-        return <DashboardPage userRole={user!} setHistory={setHistory} />;
+        return <DashboardPage userRole={user!} />;
     }
   };
   

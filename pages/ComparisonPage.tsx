@@ -1,32 +1,27 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SimulationSnapshot, HistoryEntry } from '../types';
-import ComparisonSummary from '../components/charts/ComparisonSummary';
-import ComparisonMetricChart from '../components/charts/ComparisonMetricChart';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { BackIcon, ComparisonIcon, SelectIcon } from '../components/icons';
+import { BackIcon, ComparisonIcon } from '../components/icons';
 
 interface ComparisonPageProps {
   history: HistoryEntry[];
-  setHistory: (value: HistoryEntry[] | ((val: HistoryEntry[]) => HistoryEntry[])) => void;
 }
 
-const ComparisonPage: React.FC<ComparisonPageProps> = ({ history, setHistory }) => {
+const ComparisonPage: React.FC<ComparisonPageProps> = ({ history }) => {
   const [selectedSnapshotIds, setSelectedSnapshotIds] = useState<Set<string>>(new Set());
 
   // Convert history to snapshots for comparison
   const comparisonData = useMemo(() => {
-    const snapshots: SimulationSnapshot[] = history
+    return history
       .filter(entry => entry.status === 'completed' && entry.results)
       .map(entry => ({
         id: entry.id,
-        entryId: entry.id,
         timestamp: entry.timestamp,
         inputs: entry.inputs,
         results: entry.results,
         isSelected: selectedSnapshotIds.has(entry.id),
       }));
-    return snapshots;
   }, [history, selectedSnapshotIds]);
 
   const toggleSelection = (id: string) => {
@@ -55,19 +50,10 @@ const ComparisonPage: React.FC<ComparisonPageProps> = ({ history, setHistory }) 
   const compareSelected = () => {
     const selectedIds = Array.from(selectedSnapshotIds);
     if (selectedIds.length >= 2) {
-      // Store selection for the comparison results page
       sessionStorage.setItem('comparisonSelection', JSON.stringify(selectedIds));
-      // Navigate to comparison results page
       window.location.hash = 'comparison-results';
     } else {
       alert('Please select at least 2 simulations to compare.');
-    }
-  };
-
-  // Show alert if trying to compare without enough simulations
-  const showCompareWarning = () => {
-    if (selectedSnapshotIds.size < 2) {
-      alert(`Please select at least 2 simulations. Currently selected: ${selectedSnapshotIds.size}`);
     }
   };
 
