@@ -80,12 +80,12 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
         const point: any = { year };
 
         // Add all metric keys for ALL snapshots (urban for s1, urban for s2, rural for s1, rural for s2)
-        snapshots.forEach((snapshot) => {
+        snapshots.forEach((snapshot, snapshotIdx) => {
           const dataPoint = (data as any[]).find((d: any) => d.year === year);
           if (dataPoint) {
             metricKeys.forEach(key => {
-              // Use format: "policyName - metric" like "Healthcare - Urban"
-              point[`${snapshot.inputs.policyName} - ${key.charAt(0).toUpperCase() + key.slice(1)}`] = dataPoint[key];
+              // Use unique format with snapshot index to differentiate same-named policies
+              point[`${snapshot.inputs.policyName} (#${snapshotIdx + 1}) - ${key.charAt(0).toUpperCase() + key.slice(1)}`] = dataPoint[key];
             });
           }
         });
@@ -98,9 +98,9 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
       let colorIdx = 0;
       const colorPalette = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
-      snapshots.forEach((snapshot) => {
+      snapshots.forEach((snapshot, snapshotIdx) => {
         metricKeys.forEach(key => {
-          const keyName = `${snapshot.inputs.policyName} - ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+          const keyName = `${snapshot.inputs.policyName} (#${snapshotIdx + 1}) - ${key.charAt(0).toUpperCase() + key.slice(1)}`;
           colors[keyName] = colorPalette[colorIdx % colorPalette.length];
           colorIdx++;
         });
@@ -120,12 +120,12 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
             />
             <Tooltip
               contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-              formatter={(value: number, name: any) => [`${value.toFixed(1)} ${unit || ''}`, name]}
+              formatter={(value: number, name: any) => [`${value.toFixed(2)} ${unit || ''}`, name]}
             />
             {showLegend && <Legend />}
-            {snapshots.map((snapshot) =>
+            {snapshots.map((snapshot, snapshotIdx) =>
               metricKeys.map(key => {
-                const lineKey = `${snapshot.inputs.policyName} - ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                const lineKey = `${snapshot.inputs.policyName} (#${snapshotIdx + 1}) - ${key.charAt(0).toUpperCase() + key.slice(1)}`;
                 return (
                   <Line
                     key={lineKey}
@@ -150,7 +150,7 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
     const chartDataPoints = years.map(year => {
       const point: any = { year };
 
-      snapshots.forEach((snapshot) => {
+      snapshots.forEach((snapshot, snapshotIdx) => {
         const dataPoint = (data as LineChartDataPoint[]).find((d: LineChartDataPoint) => d.year === year);
         if (dataPoint) {
           point[snapshot.inputs.policyName] = dataPoint.value as number;
@@ -163,7 +163,7 @@ const ComparisonMetricChart: React.FC<ComparisonMetricChartProps> = ({
     return (
       <ResponsiveContainer width="100%" height={350}>
         <LineChart data={chartDataPoints} margin={{ top: 5, right: 30, left: 20, bottom: 25 }}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokedasharray="3 3" />
           <XAxis
             dataKey="year"
             label={{ value: 'Year', position: 'insideBottom', offset: -5 }}
